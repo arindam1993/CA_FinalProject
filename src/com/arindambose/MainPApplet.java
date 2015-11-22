@@ -44,7 +44,7 @@ public class MainPApplet extends PApplet{
 		c2.addNote(11, 1, 2);
 		c2.addNote(3, 1, 3);
 		c2.addNote(4, 1, 4);
-		c2.addNote(8, 1, 5);
+	
 		
 		musicCircles = new ArrayList<MusicCircle>();
 		musicCircles.add(c1);
@@ -67,7 +67,14 @@ public class MainPApplet extends PApplet{
 	
 	public void mouseDragged(){
 		for(MusicCircle mp:musicCircles){
-			mp.drag(mouseX,mouseY);
+			mp.move(mouseX,mouseY);
+			mp.interactSemitones(mouseX, mouseY);
+		}
+	}
+	
+	public void mouseClicked(){
+		for(MusicCircle mp:musicCircles){
+			mp.onClicked(mouseX, mouseY);
 		}
 	}
 	

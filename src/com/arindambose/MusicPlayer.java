@@ -28,7 +28,6 @@ public class MusicPlayer {
 	
 	public void countFrames(){
 		if( isPlaying)	playFrameCounter++;
-		System.out.println(getPlayTime());
 	}
 	
 	public float getPlayTime(){

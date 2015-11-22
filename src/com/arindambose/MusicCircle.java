@@ -143,11 +143,56 @@ public class MusicCircle {
 	}
 	
 	//Call In mousedragged()
-	public void drag(int x, int y){
+	public void move(int x, int y){
 		if(Math.sqrt((x - center.x)*(x - center.x) + (y - center.y)*(y - center.y)) < initOffset){
 			center.x = x;
 			center.y = y;
 		}
+	}
+	
+	//Call In mouseDragged()
+	public void onClicked(int x, int y){
+		
+	}
+	
+	//Call in mousedragged()
+	public void interactSemitones(int x, int y){
+		pt mousePt = pApp.P(x,y);
+		//If the mouse click is wthin the right quadrant
+		if ( pApp.d(center, mousePt) < this.radius && pApp.d(center, mousePt) > initOffset){
+			vec pick = pApp.V(this.center, mousePt);
+			float pickAngle = pApp.positive(pick.angle());
+			
+			float semitone = getSemitoneFromDistance(pick.norm() - initOffset + 1);
+			int section = getSectionFromAngle(pickAngle);
+			
+			setNoteInSection(section, semitone);
+		}
+	}
+	
+	
+	private int getSectionFromAngle(float angle){
+		return (int) (angle/getCellRadians());
+	}
+	
+	private float getSemitoneFromDistance(float distance){
+		return (float) Math.floor(distance/getCellHeight());
+	}
+	
+	private void setNoteInSection(int section, float semitone){
+		float startTime = section * sectionDuration;
+		//Change existing note if one is found
+		for( int i = 0; i < noteCount ; i++){
+			if( T[i] == startTime){
+				S[i] = semitone;
+				D[i] = sectionDuration;
+				
+				return;
+			}
+		}
+		
+		//If no note exists  add a note
+		addNote(semitone, sectionDuration, startTime);
 	}
 	
 	
