@@ -24,6 +24,8 @@ public class MusicCircle {
 	private vec playLine;
 	private float sectionDuration;
 	
+	private boolean isMuted;
+	
 	//Buffers which store notes
 	float T[]; // times at which the notes start
 	float D[]; //duration of each note
@@ -55,12 +57,15 @@ public class MusicCircle {
 		sectionDuration = phraseDuration/(float)(numDivisions);
 		playLine = pApp.V(this.radius, 0);
 		
+		isMuted = false;
+		
 	}
 	
 	public void render(){
 		
 		pApp.noFill();
-		pApp.pen(Color.sand, 2.0f);
+		if (!isMuted())	pApp.pen(Color.sand, 2.0f);
+		else pApp.pen(Color.red, 2.0f);
 		pApp.ellipse(center.x, center.y, 2 * this.radius, 2 * this.radius);
 		
 		
@@ -76,7 +81,7 @@ public class MusicCircle {
 		}
 		
 		//Draw play line
-		if(MusicPlayer.getInstance().isPlaying()){
+		if(MusicPlayer.getInstance().isPlaying() && !isMuted()){
 			pApp.pen(Color.red, 1.0f);
 			float angle = getCurrentPlayRadian();
 			playLine.rotateTo(angle);
@@ -87,6 +92,7 @@ public class MusicCircle {
 			pApp.line(this.center.x, this.center.y, this.center.x + playLine.x, this.center.y + playLine.y);
 		}
 		
+		pApp.scribe("Octave: "+ Lookups.getOctaveLabel(baseSemitone), this.center.x - 25, this.center.y + this.radius +25);
 		
 		
 		//Draw lines seperating each semitone
@@ -106,6 +112,22 @@ public class MusicCircle {
 		pApp.fill(Color.sand);
 		pApp.pen(Color.sand, 1.0f);
 		pApp.ellipse(center.x, center.y, 2 * initOffset, 2 * initOffset);
+		
+		
+		if(pApp.mousePressed){
+			pt mousePt = pApp.P(pApp.mouseX,pApp.mouseY);
+			//If the mouse click is within the right quadrant
+			if ( pApp.d(center, mousePt) < this.radius && pApp.d(center, mousePt) > initOffset){
+				vec pick = pApp.V(this.center, mousePt);	
+				float semitone = getSemitoneFromDistance(pick.norm() - initOffset + 1);
+
+				//Draw overlay for note
+				pApp.pen(Color.black, 0.5f);
+				pApp.fill(Color.white);		
+				pApp.ellipse(pApp.mouseX - 10, pApp.mouseY - 10, 20, 20);
+				pApp.scribe(Lookups.getSemitoneLabel(semitone), pApp.mouseX - 15, pApp.mouseY - 5);
+			}
+		}
 	}
 	
 	private float getCellHeight() {
@@ -151,14 +173,18 @@ public class MusicCircle {
 	}
 	
 	//Call In mouseDragged()
-	public void onClicked(int x, int y){
-		
+	public void muteUnmute(int x, int y){
+		pt mousePt = pApp.P(x,y);
+		if ( pApp.d(center, mousePt) < initOffset){
+			toggleMute();
+			MusicPlayer.getInstance().reset();
+		}
 	}
 	
 	//Call in mousedragged()
 	public void interactSemitones(int x, int y){
 		pt mousePt = pApp.P(x,y);
-		//If the mouse click is wthin the right quadrant
+		//If the mouse click is within the right quadrant
 		if ( pApp.d(center, mousePt) < this.radius && pApp.d(center, mousePt) > initOffset){
 			vec pick = pApp.V(this.center, mousePt);
 			float pickAngle = pApp.positive(pick.angle());
@@ -167,7 +193,19 @@ public class MusicCircle {
 			int section = getSectionFromAngle(pickAngle);
 			
 			setNoteInSection(section, semitone);
+			
 		}
+	}
+	
+	//Call in mousewheel
+	public void changeOctave(int x, int y, float direction){
+		pt mousePt = pApp.P(x,y);
+		if( pApp.d(mousePt, this.center) < initOffset){
+			this.baseSemitone += direction * 12;
+			if( this.baseSemitone > 12) this.baseSemitone = 12;
+			else if( this.baseSemitone < -12) this.baseSemitone = -12;
+		}
+		
 	}
 	
 	
@@ -176,7 +214,9 @@ public class MusicCircle {
 	}
 	
 	private float getSemitoneFromDistance(float distance){
-		return (float) Math.floor(distance/getCellHeight());
+		float semitone =  (float) Math.floor(distance/getCellHeight());
+		if(semitone < 1)return 1.0f;
+		return semitone;
 	}
 	
 	private void setNoteInSection(int section, float semitone){
@@ -185,20 +225,20 @@ public class MusicCircle {
 		for( int i = 0; i < noteCount ; i++){
 			if( T[i] == startTime){
 				S[i] = semitone;
-				D[i] = sectionDuration;
-				
+				D[i] = sectionDuration;		
 				return;
 			}
-		}
-		
+		}	
 		//If no note exists  add a note
 		addNote(semitone, sectionDuration, startTime);
 	}
 	
+	public void toggleMute(){
+		isMuted = !isMuted;
+	}
 	
-	/*
-	 * Getters and Setters
-	 */
+	
+	/********Getters and Setters********/
 	
 	public int getNumNotes() {
 		return numNotes;
@@ -218,6 +258,10 @@ public class MusicCircle {
 
 	public float getS(int index) {
 		return S[index];
+	}
+	
+	public boolean isMuted(){
+		return isMuted;
 	}
 
 	

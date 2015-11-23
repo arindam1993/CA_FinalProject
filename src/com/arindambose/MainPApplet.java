@@ -8,6 +8,7 @@ import com.arindambose.MainPApplet.vec;
 
 import processing.core.PApplet;
 import processing.core.PImage;
+import processing.event.MouseEvent;
 
 public class MainPApplet extends PApplet{
 
@@ -22,6 +23,7 @@ public class MainPApplet extends PApplet{
 	
 	MusicCircle c1;
 	MusicCircle c2;
+	MusicCircle c3;
 	
 	//Musicplayer pulls data from here.
 	public ArrayList<MusicCircle> musicCircles;
@@ -32,8 +34,8 @@ public class MainPApplet extends PApplet{
 		
 		abFace = loadImage("data/portrait_bose.jpg"); 
 		c1 = new MusicCircle(150, P(500,500), 5, 12, 0);
-		c1.addNote(3, 0.5f, 0);
-		c1.addNote(5, 1, 0.5f);
+		c1.addNote(3, 1, 0);
+		c1.addNote(5, 1, 1);
 		c1.addNote(7, 1, 2);
 		c1.addNote(2, 1, 3);
 		c1.addNote(1, 1, 4);
@@ -44,11 +46,14 @@ public class MainPApplet extends PApplet{
 		c2.addNote(11, 1, 2);
 		c2.addNote(3, 1, 3);
 		c2.addNote(4, 1, 4);
+		
+		c3 = new MusicCircle(150, P(300,300), 5, 12, -12);
 	
 		
 		musicCircles = new ArrayList<MusicCircle>();
 		musicCircles.add(c1);
 		musicCircles.add(c2);
+		musicCircles.add(c3);
 		
 		MusicPlayer.getInstance();
 	}
@@ -72,9 +77,10 @@ public class MainPApplet extends PApplet{
 		}
 	}
 	
+	
 	public void mouseClicked(){
 		for(MusicCircle mp:musicCircles){
-			mp.onClicked(mouseX, mouseY);
+			mp.muteUnmute(mouseX, mouseY);
 		}
 	}
 	
@@ -82,7 +88,11 @@ public class MainPApplet extends PApplet{
 		if(key == 'p') MusicPlayer.getInstance().togglePlaying();
 	}
 	
-	
+	public void mouseWheel(MouseEvent event){
+		for(MusicCircle mp:musicCircles){
+			mp.changeOctave(mouseX, mouseY, event.getAmount());
+		}
+	}
 	
 	
 	

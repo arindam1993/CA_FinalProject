@@ -61,9 +61,10 @@ public class MusicPlayer {
 	
 	//Store all Notes from a MusicCircle
 	private void getNotes(MusicCircle circle){
-		
-		for(int i=0; i<circle.getNumNotes(); i++){
-			note(circle.getT(i), circle.getD(i), Fofs(circle.getS(i) + circle.getBaseSemitone()));
+		if(! circle.isMuted()){
+			for(int i=0; i<circle.getNumNotes(); i++){
+				note(circle.getT(i), circle.getD(i), Fofs(circle.getS(i) + circle.getBaseSemitone()));
+			}
 		}
 	}
 	
@@ -84,6 +85,13 @@ public class MusicPlayer {
 
 	public boolean isPlaying() {
 		return isPlaying;
+	}
+	
+	public void reset(){
+		if(isPlaying){
+			stopPlaying();
+			startPlaying();
+		}
 	}
 	
 	
