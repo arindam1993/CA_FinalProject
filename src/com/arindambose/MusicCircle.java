@@ -26,6 +26,9 @@ public class MusicCircle {
 	
 	private boolean isMuted;
 	
+	private pt leftArrowCenter;
+	private pt rightArrowCenter;
+	
 	//Buffers which store notes
 	float T[]; // times at which the notes start
 	float D[]; //duration of each note
@@ -42,21 +45,10 @@ public class MusicCircle {
 		this.center = center;
 		this.numDivisions = numDivisions;
 		this.numSemitones = numSemitones;
-		
-		this.numNotes = numSemitones * numDivisions;
+
 		this.baseSemitone = baseSemitone;
 	
-		
-		//Initialize music buffers (Semitone buffers)
-		noteCount = 0;
-		T = new float[this.numNotes];
-		D = new float[this.numNotes];
-		S = new float[this.numNotes];
-		
-		phraseDuration = clipDuration;
-		sectionDuration = phraseDuration/(float)(numDivisions);
-		playLine = pApp.V(this.radius, 0);
-		System.out.println("Section du:"+ sectionDuration);
+		calcParams();
 		
 		isMuted = false;
 		
@@ -114,6 +106,17 @@ public class MusicCircle {
 		pApp.pen(Color.sand, 1.0f);
 		pApp.ellipse(center.x, center.y, 2 * initOffset, 2 * initOffset);
 		
+		//Draw Arrows 
+		pApp.fill(Color.black);
+		pt leftArrowCenter = getLeftArrowCenter();
+		pApp.show(pApp.P(leftArrowCenter.x - 10, leftArrowCenter.y), 
+					pApp.P(leftArrowCenter.x , leftArrowCenter.y + 10), 
+					pApp.P(leftArrowCenter.x , leftArrowCenter.y - 10));
+		pt rightArrowCenter = getRightArrowCenter();
+		pApp.show(pApp.P(rightArrowCenter.x + 10, rightArrowCenter.y), 
+					pApp.P(rightArrowCenter.x , rightArrowCenter.y + 10), 
+					pApp.P(rightArrowCenter.x , rightArrowCenter.y - 10));
+		
 		
 		if(pApp.mousePressed){
 			pt mousePt = pApp.P(pApp.mouseX,pApp.mouseY);
@@ -130,6 +133,8 @@ public class MusicCircle {
 			}
 		}
 	}
+	
+	
 	
 	private float getCellHeight() {
 		return (this.radius - initOffset)/this.numSemitones;
@@ -188,6 +193,17 @@ public class MusicCircle {
 			int section = getSectionFromAngle(pickAngle);
 	
 			addOrRemoveNote(section, semitone);
+		}else if(pApp.d(getLeftArrowCenter(), mousePt) < 10){
+			//Left arrow is clicked
+			if(this.numDivisions > 4){
+				this.numDivisions /= 2;
+				this.setNumDivisions(this.numDivisions);
+			}
+		}else if(pApp.d(getRightArrowCenter(), mousePt) < 10){
+			if (this.numDivisions < 32){
+				this.numDivisions *= 2;
+				this.setNumDivisions(this.numDivisions);
+			}
 		}
 	}
 	
@@ -263,6 +279,14 @@ public class MusicCircle {
 		isMuted = !isMuted;
 	}
 	
+	private pt getLeftArrowCenter(){
+		return pApp.P(this.center.x - this.radius - 25 , this.center.y);
+	}
+	
+	private pt getRightArrowCenter(){
+		return pApp.P(this.center.x + this.radius + 25 , this.center.y);
+	}
+	
 	
 	/********Getters and Setters********/
 	
@@ -290,6 +314,24 @@ public class MusicCircle {
 		return isMuted;
 	}
 
+	public void setNumDivisions(int div){
+		this.numDivisions = div;
+		calcParams();
+	}
 	
+	private void calcParams(){
+		this.numNotes = this.numSemitones * this.numDivisions;
+		
+		//Initialize music buffers (Semitone buffers)
+		noteCount = 0;
+		T = new float[this.numNotes];
+		D = new float[this.numNotes];
+		S = new float[this.numNotes];
+		
+		phraseDuration = clipDuration;
+		sectionDuration = this.phraseDuration/(float)(this.numDivisions);
+		playLine = pApp.V(this.radius, 0);
+		
+	}
 
 }
