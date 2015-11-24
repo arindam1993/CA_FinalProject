@@ -73,14 +73,14 @@ public class MainPApplet extends PApplet{
 	public void mouseDragged(){
 		for(MusicCircle mp:musicCircles){
 			mp.move(mouseX,mouseY);
-			mp.interactSemitones(mouseX, mouseY);
+			mp.changeSemitone(mouseX, mouseY);
 		}
 	}
 	
 	
 	public void mouseClicked(){
 		for(MusicCircle mp:musicCircles){
-			mp.muteUnmute(mouseX, mouseY);
+			mp.onClicked(mouseX, mouseY);
 		}
 	}
 	

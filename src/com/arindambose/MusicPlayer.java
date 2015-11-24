@@ -16,7 +16,7 @@ public class MusicPlayer {
 	Minim minim;
 	AudioOutput out;
 	
-	float SILENCE=1000;
+	public static float SILENCE=1000;
 	
 	private int playFrameCounter;
 	
@@ -63,7 +63,7 @@ public class MusicPlayer {
 	private void getNotes(MusicCircle circle){
 		if(! circle.isMuted()){
 			for(int i=0; i<circle.getNumNotes(); i++){
-				note(circle.getT(i), circle.getD(i), Fofs(circle.getS(i) + circle.getBaseSemitone()));
+				if( circle.getS(i) != SILENCE) note(circle.getT(i), circle.getD(i), Fofs(circle.getS(i) + circle.getBaseSemitone()));
 			}
 		}
 	}

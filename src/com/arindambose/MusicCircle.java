@@ -150,10 +150,11 @@ public class MusicCircle {
 		float semitoneAngleEnd = (startTime + duration) * getCellRadians();
 		float semitoneRadius = initOffset + (semitone - 1) * getCellHeight() + getCellHeight()/2;
 		
-		//Draw the arc
-		pApp.noFill();
-		pApp.pen(Color.grey, getCellHeight() - thicknessOffset);
-		pApp.arc(this.center.x, this.center.y, 2 * semitoneRadius, 2 * semitoneRadius, semitoneAngleStart, semitoneAngleEnd);
+		if(semitone != MusicPlayer.SILENCE){		//Draw the arc
+			pApp.noFill();
+			pApp.pen(Color.grey, getCellHeight() - thicknessOffset);
+			pApp.arc(this.center.x, this.center.y, 2 * semitoneRadius, 2 * semitoneRadius, semitoneAngleStart, semitoneAngleEnd);
+		}
 		
 	}
 	
@@ -174,16 +175,24 @@ public class MusicCircle {
 	}
 	
 	//Call In mouseDragged()
-	public void muteUnmute(int x, int y){
+	public void onClicked(int x, int y){
 		pt mousePt = pApp.P(x,y);
 		if ( pApp.d(center, mousePt) < initOffset){
 			toggleMute();
 			MusicPlayer.getInstance().reset();
+		}else if( pApp.d(center, mousePt) > initOffset && pApp.d(center, mousePt) < radius){
+			vec pick = pApp.V(this.center, mousePt);
+			float pickAngle = pApp.positive(pick.angle());
+			
+			float semitone = getSemitoneFromDistance(pick.norm() - initOffset + 1);
+			int section = getSectionFromAngle(pickAngle);
+	
+			addOrRemoveNote(section, semitone);
 		}
 	}
 	
 	//Call in mousedragged()
-	public void interactSemitones(int x, int y){
+	public void changeSemitone(int x, int y){
 		pt mousePt = pApp.P(x,y);
 		//If the mouse click is within the right quadrant
 		if ( pApp.d(center, mousePt) < this.radius && pApp.d(center, mousePt) > initOffset){
@@ -193,7 +202,7 @@ public class MusicCircle {
 			float semitone = getSemitoneFromDistance(pick.norm() - initOffset + 1);
 			int section = getSectionFromAngle(pickAngle);
 	
-			setNoteInSection(section, semitone);
+			editNoteInSection(section, semitone);
 			
 		}
 	}
@@ -220,19 +229,34 @@ public class MusicCircle {
 		return semitone;
 	}
 	
-	private void setNoteInSection(int section, float semitone){
+	private void editNoteInSection(int section, float semitone){
 		float startTime = section * sectionDuration * (numDivisions / phraseDuration);
 		//Change existing note if one is found
 		for( int i = 0; i < noteCount ; i++){
-			if( T[i] == startTime){
+			if( T[i] == startTime && S[i] != MusicPlayer.SILENCE){
 				S[i] = semitone;
 				D[i] = sectionDuration * (numDivisions / phraseDuration);		
 				return;
 			}
 		}	
 		//If no note exists  add a note
+//		addNote(semitone, sectionDuration * (numDivisions / phraseDuration), startTime);
+//		System.out.println("Adding: "+ semitone +" " + sectionDuration + " " +startTime);
+	}
+	
+	private void addOrRemoveNote(int section, float semitone){
+		float startTime = section * sectionDuration * (numDivisions / phraseDuration);
+		//Remove note if one it exists
+		for( int i = 0; i < noteCount ; i++){
+			if( T[i] == startTime && S[i] != MusicPlayer.SILENCE){
+				S[i] = MusicPlayer.SILENCE;
+				D[i] = sectionDuration * (numDivisions / phraseDuration);		
+				return;
+			}
+		}	
+		
+		//Else add the note
 		addNote(semitone, sectionDuration * (numDivisions / phraseDuration), startTime);
-		System.out.println("Adding: "+ semitone +" " + sectionDuration + " " +startTime);
 	}
 	
 	public void toggleMute(){
