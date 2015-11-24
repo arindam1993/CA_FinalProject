@@ -33,21 +33,21 @@ public class MainPApplet extends PApplet{
 		Instance = this;
 		
 		abFace = loadImage("data/portrait_bose.jpg"); 
-		c1 = new MusicCircle(150, P(500,500), 5, 12, 0);
-		c1.addNote(3, 1, 0);
-		c1.addNote(5, 1, 1);
-		c1.addNote(7, 1, 2);
-		c1.addNote(2, 1, 3);
-		c1.addNote(1, 1, 4);
-		
-		c2 = new MusicCircle(150, P(200,200), 5, 12,12);
-		c2.addNote(2, 1, 0);
-		c2.addNote(9, 1, 1);
-		c2.addNote(11, 1, 2);
-		c2.addNote(3, 1, 3);
-		c2.addNote(4, 1, 4);
-		
-		c3 = new MusicCircle(150, P(300,300), 5, 12, -12);
+		c1 = new MusicCircle(150, P(500,500), 4, 12, 0);
+//		c1.addNote(3, 1, 0);
+//		c1.addNote(5, 1, 1);
+//		c1.addNote(7, 1, 2);
+//		c1.addNote(2, 1, 3);
+//		c1.addNote(1, 1, 4);
+//		
+		c2 = new MusicCircle(150, P(200,200), 8, 12,12);
+//		c2.addNote(2, 1, 0);
+//		c2.addNote(9, 1, 1);
+//		c2.addNote(11, 1, 2);
+//		c2.addNote(3, 1, 3);
+//		c2.addNote(4, 1, 4);
+//		
+		c3 = new MusicCircle(150, P(300,300), 16, 12, -12);
 	
 		
 		musicCircles = new ArrayList<MusicCircle>();

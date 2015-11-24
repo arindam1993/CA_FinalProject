@@ -33,7 +33,7 @@ public class MusicCircle {
 	
 	static final float initOffset = 50.0f;
 	static final float thicknessOffset = 2.0f;
-	static final float clipDuration = 5.0f;
+	static final float clipDuration = 4.0f;
 	
 	public MusicCircle(float radius, pt center, int numDivisions, int numSemitones, float baseSemitone){
 		pApp = MainPApplet.Instance;
@@ -56,6 +56,7 @@ public class MusicCircle {
 		phraseDuration = clipDuration;
 		sectionDuration = phraseDuration/(float)(numDivisions);
 		playLine = pApp.V(this.radius, 0);
+		System.out.println("Section du:"+ sectionDuration);
 		
 		isMuted = false;
 		
@@ -191,7 +192,7 @@ public class MusicCircle {
 			
 			float semitone = getSemitoneFromDistance(pick.norm() - initOffset + 1);
 			int section = getSectionFromAngle(pickAngle);
-			
+	
 			setNoteInSection(section, semitone);
 			
 		}
@@ -220,17 +221,18 @@ public class MusicCircle {
 	}
 	
 	private void setNoteInSection(int section, float semitone){
-		float startTime = section * sectionDuration;
+		float startTime = section * sectionDuration * (numDivisions / phraseDuration);
 		//Change existing note if one is found
 		for( int i = 0; i < noteCount ; i++){
 			if( T[i] == startTime){
 				S[i] = semitone;
-				D[i] = sectionDuration;		
+				D[i] = sectionDuration * (numDivisions / phraseDuration);		
 				return;
 			}
 		}	
 		//If no note exists  add a note
-		addNote(semitone, sectionDuration, startTime);
+		addNote(semitone, sectionDuration * (numDivisions / phraseDuration), startTime);
+		System.out.println("Adding: "+ semitone +" " + sectionDuration + " " +startTime);
 	}
 	
 	public void toggleMute(){
