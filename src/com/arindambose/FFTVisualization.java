@@ -22,8 +22,8 @@ public class FFTVisualization {
 		this.yHeight = yHeight;
 		
 		pApp = MainPApplet.Instance;
-		startPt = pApp.P(0, yHeight);
-		endPt = pApp.P(width, yHeight);
+		startPt = pApp.P(0, this.yHeight);
+		endPt = pApp.P(width, this.yHeight);
 		
 		side1CntrlPts = new pt[MusicVisData.numSamples];
 		side2CntrlPts = new pt[MusicVisData.numSamples];
@@ -45,15 +45,15 @@ public class FFTVisualization {
 		float baseX = startPt.x;
 		float baseY = startPt.y;
 		
-		float incX = this.width/(MusicVisData.numSamples + 1);
 		for(int i = 0; i<MusicVisData.numSamples ; i++){
-			baseX+=incX;
-			side1CntrlPts[i].x = baseX;
-			side1CntrlPts[i].y = baseY - MusicVisData.getInstance().getSample(i);
+			pt sample = MusicVisData.getInstance().getSample(i);
+			System.out.println(sample.x + "   " + sample.y);
+			side1CntrlPts[i].x = baseX + ( this.width * sample.x/ (float)(MusicVisData.numSamples));
+			side1CntrlPts[i].y = baseY - sample.y;
 			
 			
-			side2CntrlPts[i].x = baseX;
-			side2CntrlPts[i].y = baseY + MusicVisData.getInstance().getSample(i);
+			side2CntrlPts[i].x = baseX + ( this.width * sample.x/MusicVisData.numSamples);
+			side2CntrlPts[i].y = baseY + sample.y;
 		}
 	}
 
