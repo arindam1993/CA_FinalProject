@@ -34,7 +34,7 @@ public class MusicCircle {
 	float D[]; //duration of each note
 	float S[]; //Semitone of each note
 	
-	static final float initOffset = 50.0f;
+	static final float initOffset = 20.0f;
 	static final float thicknessOffset = 2.0f;
 	static final float clipDuration = 4.0f;
 	
@@ -79,8 +79,8 @@ public class MusicCircle {
 			float angle = getCurrentPlayRadian();
 			playLine.rotateTo(angle);
 			if(angle > 2 * Math.PI){
-				MusicPlayer.getInstance().stopPlaying();
-				MusicPlayer.getInstance().startPlaying();
+				MusicPlayer.getInstance().reset();;
+
 			}
 			pApp.line(this.center.x, this.center.y, this.center.x + playLine.x, this.center.y + playLine.y);
 		}

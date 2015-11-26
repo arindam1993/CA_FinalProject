@@ -16,6 +16,8 @@ public class MusicPlayer {
 	Minim minim;
 	AudioOutput out;
 	
+	private float loopOffset = 0.0f;
+	
 	public static float SILENCE=1000;
 	
 	private int playFrameCounter;
@@ -24,6 +26,7 @@ public class MusicPlayer {
 		minim = new Minim(MainPApplet.Instance);
 		isPlaying = false;
 		this.playFrameCounter = 0;
+		out = minim.getLineOut(Minim.MONO,1024*16); 
 	}
 	
 	public void countFrames(){
@@ -38,7 +41,7 @@ public class MusicPlayer {
 		return Instance;		
 	}
 	
-	public void togglePlaying(){
+	public void togglePlaying(){ 
 		if (isPlaying) stopPlaying();
 		else startPlaying();
 	}
@@ -63,18 +66,20 @@ public class MusicPlayer {
 	private void getNotes(MusicCircle circle){
 		if(! circle.isMuted()){
 			for(int i=0; i<circle.getNumNotes(); i++){
-				if( circle.getS(i) != SILENCE) note(circle.getT(i), circle.getD(i), Fofs(circle.getS(i) + circle.getBaseSemitone()));
+				if( circle.getS(i) != SILENCE) note(circle.getT(i) + loopOffset, circle.getD(i), Fofs(circle.getS(i) + circle.getBaseSemitone()));
 			}
 		}
 	}
 	
 	void playPhrase(){
+		
 	   out.pauseNotes(); // do not play yet, first put all notes into the play buffer to help synchronization
 	   //Get all notes from music circles in PApplet
 	   for(MusicCircle musicCircle : MainPApplet.Instance.musicCircles){
 		   getNotes(musicCircle);
 	   }
 	   out.resumeNotes(); // play now
+	   
 	}
 		   
 	void note(float start, float duration, float freq){ // adds a note to the play buffer
@@ -91,7 +96,24 @@ public class MusicPlayer {
 		if(isPlaying){
 			stopPlaying();
 			startPlaying();
+			MusicVisData.getInstance().songChanged();
 		}
+	}
+	
+	public AudioBuffer getBuffer(){
+		return out.mix;
+	}
+	
+	public float getSampleRate(){
+		return out.sampleRate();
+	}
+	
+	public int getBufferSize(){
+		return out.bufferSize();
+	}
+	public void reLoop(){
+		out.setNoteOffset(0.0f);
+		playFrameCounter = 0;
 	}
 	
 	

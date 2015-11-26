@@ -19,43 +19,43 @@ public class MainPApplet extends PApplet{
 	public static MainPApplet Instance;
 	
 	public void settings() {  size(1280, 720); smooth(); ;}
-	
-	
-	MusicCircle c1;
-	MusicCircle c2;
-	MusicCircle c3;
+
 	
 	//Musicplayer pulls data from here.
 	public ArrayList<MusicCircle> musicCircles;
 	
+	public vec circleSpawn;
+	public vec circleChange;
+	
+	public FFTVisualization fftVis;
 	public void setup(){
 		frameRate(30);
 		Instance = this;
 		
 		abFace = loadImage("data/portrait_bose.jpg"); 
-		c1 = new MusicCircle(150, P(500,500), 4, 12, 0);
-//		c1.addNote(3, 1, 0);
-//		c1.addNote(5, 1, 1);
-//		c1.addNote(7, 1, 2);
-//		c1.addNote(2, 1, 3);
-//		c1.addNote(1, 1, 4);
-//		
-		c2 = new MusicCircle(150, P(200,200), 8, 12,12);
-//		c2.addNote(2, 1, 0);
-//		c2.addNote(9, 1, 1);
-//		c2.addNote(11, 1, 2);
-//		c2.addNote(3, 1, 3);
-//		c2.addNote(4, 1, 4);
-//		
-		c3 = new MusicCircle(150, P(300,300), 16, 12, -12);
-	
+		circleSpawn = V(200,200);
+		circleChange = V(75,75);
 		
 		musicCircles = new ArrayList<MusicCircle>();
-		musicCircles.add(c1);
-		musicCircles.add(c2);
-		musicCircles.add(c3);
 		
+		addCircle();
+		addCircle();
+		addCircle();
 		MusicPlayer.getInstance();
+		
+		fftVis = new FFTVisualization(width, 500);
+	}
+	
+	public void addCircle(){
+		musicCircles.add(new MusicCircle(100, P(circleSpawn.x, circleSpawn.y), 4, 12, 0));
+		circleSpawn.add(circleChange);
+	}
+	
+	public void removeCircle(){
+		if(musicCircles.size() > 0){
+			musicCircles.remove(musicCircles.size() - 1);
+			circleSpawn.sub(circleChange);
+		}
 	}
 	
 	public void draw(){
@@ -66,7 +66,14 @@ public class MainPApplet extends PApplet{
 			mp.render();
 		}
 		MusicPlayer.getInstance().countFrames();
+		MusicVisData.getInstance().updateBars();
 		
+		fftVis.render();
+		
+//		for (int i=0 ; i < MusicVisData.numSamples ; i++){
+//			System.out.print(MusicVisData.getInstance().getSample(i)+ " ");
+//		}
+//		System.out.print('\n');
 	}
 	
 	
@@ -86,6 +93,8 @@ public class MainPApplet extends PApplet{
 	
 	public void keyPressed(){
 		if(key == 'p') MusicPlayer.getInstance().togglePlaying();
+		if(key == '+') addCircle();
+		if(key == '-') removeCircle();
 	}
 	
 	public void mouseWheel(MouseEvent event){
@@ -93,6 +102,8 @@ public class MainPApplet extends PApplet{
 			mp.changeOctave(mouseX, mouseY, event.getAmount());
 		}
 	}
+	
+	
 	
 	
 	
@@ -311,6 +322,7 @@ public class MainPApplet extends PApplet{
 	  public vec normalize() {float n=sqrt(sq(x)+sq(y)); if (n>0.000001f) {x/=n; y/=n;}; return this;};
 	  public vec add(float u, float v) {x += u; y += v; return this;};
 	  public vec add(vec V) {x += V.x; y += V.y; return this;};   
+	  public vec sub(vec V) {x -= V.x; y -= V.y; return this;};  
 	  public vec add(float s, vec V) {x += s*V.x; y += s*V.y; return this;};   
 	  public vec rotateBy(float a) {float xx=x, yy=y; x=xx*cos(a)-yy*sin(a); y=xx*sin(a)+yy*cos(a); return this;};
 	  public void rotateTo(float a){float mag = this.norm(); x = mag * cos(a); y = mag * sin(a);};
