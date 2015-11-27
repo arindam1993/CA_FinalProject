@@ -382,12 +382,13 @@ public class MainPApplet extends PApplet{
 	// LERP
 	public pt L(pt A, pt B, float t) {return P(A.x+t*(B.x-A.x),A.y+t*(B.y-A.y));}
 	public pt L(pt A, float t, pt B) {return L(A,B,t);}								//just a different config for imported classes
-			    
+	
 	// measure 
 	public boolean isSame(pt A, pt B) {return (A.x==B.x)&&(A.y==B.y) ;}                                         // A==B
 	public boolean isSame(pt A, pt B, float e) {return ((abs(A.x-B.x)<e)&&(abs(A.y-B.y)<e));}                   // ||A-B||<e
 	public float d(pt P, pt Q) {return sqrt(d2(P,Q));  };                                                       // ||AB|| (Distance)
 	public float d2(pt P, pt Q) {return sq(Q.x-P.x)+sq(Q.y-P.y); };                                             // AB*AB (Distance squared)
+	public float slope(pt p1, pt p2) { return  (p2.y - p1.y)/(p2.x - p1.x);}
 	
 	//************************************************************************
 	//**** VECTOR FUNCTIONS
