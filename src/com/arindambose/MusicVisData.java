@@ -16,7 +16,7 @@ public class MusicVisData {
 	
 	public static final int numSamples = 384;
 	
-	public static final int lnmsWindowSize = 10;
+	public static final int lnmsWindowSize = 6;
 	
 	private static MusicVisData instance;
 	
